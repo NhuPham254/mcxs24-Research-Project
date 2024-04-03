@@ -1,0 +1,129 @@
+---
+title: "Research proposal"
+author: "Nhu Minh Pham"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+library(readrba)
+library(readabs)
+library(ggplot2)
+library(tsibble)
+```
+
+```{r}
+
+```
+
+**Unemployment Rate**
+
+```{r}
+unmp <- read_abs(series_id = "A84423130A")
+# "6202.0", tables = 37
+
+```
+
+```{r}
+plot(unmp$date, unmp$value, type = "l", xlab = "Date", ylab = "Value", main = "Unemployment
+     rate from 1/1991 to 2/2024")
+
+```
+
+**GDP per capita: Chain volume measures - Percentage changes**
+
+```{r}
+gdp <- read_abs(series_id = "A2304372W")
+# 5206.0
+
+```
+
+```{r}
+plot(gdp$date[gdp$date >= "1991-03-01"], gdp$value[gdp$date >= "1991-03-01"], 
+     type = "l", xlab = "Date", ylab = "Value", main = "GDP per capita from 1/1991
+     to 12/2023")
+```
+
+**Wage price index**
+
+```{r}
+wpi <- read_abs(series_id = "A2615579C")
+# 6345.0
+
+percentage_change <- c(NA, diff(wpi$value) / lag(wpi$value, default = 1) * 100)
+
+# Assign the percentage_change vector to the dataset
+wpi$percentage_change <- percentage_change[1:nrow(wpi)]
+```
+
+```{r}
+plot(wpi$date[wpi$date >= "1991-03-01"], wpi$percentage_change[wpi$date >= "1991-03-01"], 
+     type = "l", xlab = "Date", ylab = "Value", main = "WPI from 1/1991 to 12/2023")
+```
+
+**Consumer price index**
+
+```{r}
+cpi <- read_abs(series_id = "A2325850V")
+# 6401.0
+```
+
+```{r}
+plot(cpi$date[cpi$date >= "1991-03-01"], cpi$value[cpi$date >= "1991-03-01"], 
+     type = "l", xlab = "Date", ylab = "Value", main = "CPI from 1/1991 to 12/2023")
+```
+
+**Interest rate**
+
+```{r}
+cashrate <- read_rba(series_id = "FIRMMCRT")
+```
+
+```{r}
+cashrate_subset <- cashrate[cashrate$date >= "1991-01-01", ]
+
+```
+
+```{r}
+library(xts)
+cashrate_xts <- xts(cashrate_subset$value, order.by = cashrate_subset$date)
+
+# Aggregate to quarterly frequency
+cashrate_quarterly <- apply.quarterly(cashrate_xts, mean)
+
+colnames(cashrate_quarterly) <- c("value")
+
+cashrate_quarterly_df <- data.frame(date = index(cashrate_quarterly), value = coredata(cashrate_quarterly))
+```
+
+```{r}
+
+plot(cashrate_quarterly_df$date, cashrate_quarterly_df$value, 
+     type = "l", xlab = "Date", ylab = "Value", main = "Cash rate from 1/1991 to 12/2023")
+```
+
+Government spending
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+pre1 <- read_rba(series_id = "FIRMMCRT")
+```
+
+```{r}
+pre <- read_abs("5519.0.55.001")
+```
